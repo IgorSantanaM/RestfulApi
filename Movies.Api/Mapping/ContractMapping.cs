@@ -1,7 +1,6 @@
 ﻿using Movies.Application.Models;
 using Movies.Contracts.Requests;
 using Movies.Contracts.Responses;
-using System.Runtime.CompilerServices;
 
 namespace Movies.Api.Mapping
 {
@@ -14,7 +13,7 @@ namespace Movies.Api.Mapping
                 Id = Guid.NewGuid(),
                 Title = request.Title,
                 YearOfRelease = request.YearOfRelease,
-                Genres = request.Genres.ToList() 
+                Genres = request.Genres.ToList()
             };
         }
 
@@ -24,6 +23,7 @@ namespace Movies.Api.Mapping
             {
                 Id = movie.Id,
                 Title = movie.Title,
+                Slug = movie.Slug,
                 YearOfRelease = movie.YearOfRelease,
                 Genres = movie.Genres
             };
@@ -31,7 +31,7 @@ namespace Movies.Api.Mapping
 
         public static MoviesResponse MapToResponse(this IEnumerable<Movie> movies)
         {
-            return new MoviesResponse 
+            return new MoviesResponse
             {
                 Items = movies.Select(MapToResponse)
             };
@@ -41,7 +41,7 @@ namespace Movies.Api.Mapping
             return new Movie
             {
                 Id = id,
-                Title = request.Title, 
+                Title = request.Title,
                 YearOfRelease = request.YearOfRelease,
                 Genres = request.Genres.ToList()
             };

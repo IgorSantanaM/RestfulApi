@@ -1,9 +1,4 @@
 ﻿using Movies.Application.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Movies.Application.Repositories
 {
@@ -12,13 +7,13 @@ namespace Movies.Application.Repositories
         private readonly List<Movie> _movies = new();
         public Task<bool> CreateAsync(Movie movie)
         {
-            _movies.Add(movie);  
+            _movies.Add(movie);
             return Task.FromResult(true);
         }
 
         public Task<IEnumerable<Movie>> GetAllAsync()
         {
-            return Task.FromResult(_movies.AsEnumerable()); 
+            return Task.FromResult(_movies.AsEnumerable());
         }
 
         public Task<Movie> GetAsync(Guid id)
@@ -35,7 +30,7 @@ namespace Movies.Application.Repositories
         public Task<bool> UpdateAsync(Movie movie)
         {
             var movieIndex = _movies.FindIndex(x => x.Id == movie.Id);
-            if(movieIndex == -1)
+            if (movieIndex == -1)
             {
                 return Task.FromResult(false);
             }
@@ -47,6 +42,12 @@ namespace Movies.Application.Repositories
             var removedCount = _movies.RemoveAll(x => x.Id == id);
             var movieRemoved = removedCount > 0;
             return Task.FromResult(movieRemoved);
+        }
+
+        public Task<Movie> GetBySlugAsync(string slug)
+        {
+            var movie = _movies.SingleOrDefault(x => x.Slug == slug);
+            return Task.FromResult(movie);
         }
     }
 }
