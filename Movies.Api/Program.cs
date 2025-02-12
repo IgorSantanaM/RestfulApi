@@ -1,8 +1,10 @@
 using Movies.Application;
+using Movies.Application.Database;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
+var config = builder.Configuration;
 // Add services to the container.
 
 services.AddControllers();
@@ -11,6 +13,8 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 
 services.AddApplication();
+var connectionString = config.GetRequiredSection("Database:ConnectionString").Value;
+services.AddDatabase(connectionString);
 
 services.AddControllers();
 
@@ -28,5 +32,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+var dbInitializer = app.Services.GetRequiredService<DbInitializer>();
+await dbInitializer.InitializeAsync();
 
 app.Run();
