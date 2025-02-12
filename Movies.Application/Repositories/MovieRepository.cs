@@ -42,7 +42,7 @@ namespace Movies.Application.Repositories
             _movies[movieIndex] = movie;
             return Task.FromResult(true);
         }
-        public Task DeleteAsync(Guid id)
+        public Task<bool> DeleteAsync(Guid id)
         {
             var removedCount = _movies.RemoveAll(x => x.Id == id);
             var movieRemoved = removedCount > 0;
