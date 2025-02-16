@@ -4,6 +4,6 @@ namespace Movies.Application.Database
 {
     public interface IDbConnectionFactory
     {
-        Task<IDbConnection> CeateConnectionAsync();
+        Task<IDbConnection> CeateConnectionAsync(CancellationToken token = default);
     }
 }
