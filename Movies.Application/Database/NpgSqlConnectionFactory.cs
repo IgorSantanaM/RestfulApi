@@ -12,7 +12,7 @@ namespace Movies.Application.Database
             _connectionString = connectionString;
         }
 
-        public async Task<IDbConnection> CeateConnectionAsync(CancellationToken token = default)
+        public async Task<IDbConnection> CreateConnectionAsync(CancellationToken token = default)
         {
             var connection = new NpgsqlConnection(_connectionString);
 
