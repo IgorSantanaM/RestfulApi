@@ -1,6 +1,6 @@
 ﻿namespace Movies.Contracts.Responses
 {
-    public class MovieResponse
+    public class MovieResponse : HalResponse
     {
         public required Guid Id { get; init; }
 
@@ -13,7 +13,7 @@
         public float? Rating { get; init; }
 
         public required int YearOfRelease { get; init; }
-
+        
         public required IEnumerable<string> Genres { get; init; } = Enumerable.Empty<string>();
 
     }
