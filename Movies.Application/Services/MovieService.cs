@@ -9,12 +9,14 @@ public class MovieService : IMovieService
     private readonly IMovieRepository _movieRepository;
     private readonly IValidator<Movie> _movieValidator;
     private readonly IRatingRepository _ratingRepository;
+    private readonly IValidator<GetAllMoviesOptions> _getAllMoviesOptionsValidator;
 
-    public MovieService(IMovieRepository movieRepository, IValidator<Movie> movieValidator, IRatingRepository ratingRepository)
+    public MovieService(IMovieRepository movieRepository, IValidator<Movie> movieValidator, IRatingRepository ratingRepository, IValidator<GetAllMoviesOptions> getAllMoviesOptionsValidator)
     {
         _movieRepository = movieRepository;
         _movieValidator = movieValidator;
         _ratingRepository = ratingRepository;
+        _getAllMoviesOptionsValidator = getAllMoviesOptionsValidator;
     }
 
     public async Task<bool> CreateAsync(Movie movie, CancellationToken token = default)
@@ -33,9 +35,11 @@ public class MovieService : IMovieService
         return _movieRepository.GetBySlugAsync(slug, userid, token);
     }
 
-    public Task<IEnumerable<Movie>> GetAllAsync(Guid? userid = default, CancellationToken token = default)
+    public async Task<IEnumerable<Movie>> GetAllAsync(GetAllMoviesOptions options, CancellationToken token = default)
     {
-        return _movieRepository.GetAllAsync(userid, token);
+        await _getAllMoviesOptionsValidator.ValidateAndThrowAsync(options, token);
+
+        return await _movieRepository.GetAllAsync(options, token);
     }
 
     public async Task<Movie?> UpdateAsync(Movie movie, Guid? userid = default, CancellationToken token = default)

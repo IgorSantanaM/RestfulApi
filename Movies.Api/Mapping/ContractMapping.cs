@@ -24,6 +24,8 @@ namespace Movies.Api.Mapping
                 Id = movie.Id,
                 Title = movie.Title,
                 Slug = movie.Slug,
+                Rating = movie.Rating,
+                UserRating = movie.UserRating,
                 YearOfRelease = movie.YearOfRelease,
                 Genres = movie.Genres
             };
@@ -36,6 +38,17 @@ namespace Movies.Api.Mapping
                 Items = movies.Select(MapToResponse)
             };
         }
+
+        public static IEnumerable<MovieRatingResponse> MapToResponse(this IEnumerable<MovieRating> ratings)
+        {
+            return ratings.Select(x => new MovieRatingResponse()
+            {
+                Rating = x.Rating,
+                Slug = x.Slug,
+                MovieId = x.MovieId,
+            });        
+        }
+
         public static Movie MapToMovie(this UpdateMovieRequest request, Guid id)
         {
             return new Movie
@@ -45,6 +58,21 @@ namespace Movies.Api.Mapping
                 YearOfRelease = request.YearOfRelease,
                 Genres = request.Genres.ToList()
             };
+        }
+
+        public static GetAllMoviesOptions MapToOptions(this GetAllMoviesRequest request)
+        {
+            return new GetAllMoviesOptions()
+            {
+                Title = request.Title,
+                YearOfRelease = request.Year
+            };
+        }
+
+        public static GetAllMoviesOptions WithUser(this GetAllMoviesOptions options, Guid? userId)
+        {
+            options.userId = userId;
+            return options;
         }
     }
 }
