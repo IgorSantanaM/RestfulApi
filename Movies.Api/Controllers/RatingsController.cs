@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Movies.Api.Auth;
 using Movies.Api.Mapping;
@@ -8,6 +9,7 @@ using Movies.Contracts.Requests;
 namespace Movies.Api.Controllers
 {
     [ApiController]
+    [ApiVersion(1.0)]
     public class RatingsController : ControllerBase
     {
         private readonly IRatingService _ratingService;
@@ -19,7 +21,7 @@ namespace Movies.Api.Controllers
         [Authorize]
         [HttpPut(Endpoints.Movies.Rate)]
         public async Task<IActionResult> RateMovie([FromRoute] Guid id,
-            [FromBody] RateMovieRequest request, CancellationToken token) 
+            [FromBody] RateMovieRequest request, CancellationToken token)
         {
             var userId = HttpContext.GetUserId();
             var result = await _ratingService.RateMovieAsync(id, request.Rating, userId!.Value, token);
@@ -32,7 +34,7 @@ namespace Movies.Api.Controllers
         {
             var userId = HttpContext.GetUserId();
             var result = await _ratingService.DeleteRatingAsync(id, userId!.Value, token);
-            return result ? Ok() : NotFound();  
+            return result ? Ok() : NotFound();
         }
 
         [Authorize]
