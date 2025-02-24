@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Movies.Api.Auth;
@@ -10,6 +11,7 @@ using Movies.Contracts.Responses;
 namespace Movies.Api.Controllers
 {
     [ApiController]
+    [ApiVersion(1.0)]
     public class MoviesController : ControllerBase
     {
         private readonly IMovieService _movieService;
@@ -26,13 +28,14 @@ namespace Movies.Api.Controllers
             await _movieService.CreateAsync(movie, token);
             return CreatedAtAction(nameof(Get), new { idOrSlug = movie.Id }, movie);
         }
+
         [HttpGet(Endpoints.Movies.Get)]
         public async Task<IActionResult> Get([FromRoute] string idOrSlug, [FromServices] LinkGenerator linkGenerator, CancellationToken token)
         {
             var userId = HttpContext.GetUserId();
             var movie = Guid.TryParse(idOrSlug, out var id) ?
                 await _movieService.GetByIdAsync(id, userId, token) :
-                await _movieService.GetBySlugAsync(idOrSlug, userId,token);
+                await _movieService.GetBySlugAsync(idOrSlug, userId, token);
 
             if (movie is null)
             {
@@ -40,8 +43,8 @@ namespace Movies.Api.Controllers
             }
 
             MovieResponse response = movie.MapToResponse();
-            
-            var movieObj = new {id = movie.Id};
+
+            var movieObj = new { id = movie.Id };
 
             response.Links.Add(new Link
             {
@@ -66,9 +69,10 @@ namespace Movies.Api.Controllers
 
             return Ok(response);
         }
+
         [HttpGet(Endpoints.Movies.GetAll)]
         public async Task<IActionResult> GetAll([FromQuery] GetAllMoviesRequest request, CancellationToken token)
-        { 
+        {
             var userId = HttpContext.GetUserId();
             var options = request.MapToOptions()
                 .WithUser(userId);
@@ -93,8 +97,8 @@ namespace Movies.Api.Controllers
 
             var response = movie.MapToResponse();
             var movieObj = new { id = movie.Id };
-             
-           
+
+
 
             return Ok(response);
         }

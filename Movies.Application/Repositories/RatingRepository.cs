@@ -62,7 +62,7 @@ public class RatingRepository : IRatingRepository
         return result > 0;
     }
 
-    public async Task<IEnumerable<MovieRating>> GetRatingsForUserAsync(Guid userId, CancellationToken token = default)
+    public async Task<IEnumerable<MovieRating>> GetRatingsForUserAsync(Guid? userId, CancellationToken token = default)
     {
         using var connection = await _dbConnectionFactory.CreateConnectionAsync(token);
         return await connection.QueryAsync<MovieRating>(new CommandDefinition("""
