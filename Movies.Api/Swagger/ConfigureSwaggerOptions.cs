@@ -28,6 +28,16 @@ namespace Movies.Api.Swagger
                         Version = description.ApiVersion.ToString(),
                     });
             }
+
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please provide a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
+            });
         }
     }
 }
