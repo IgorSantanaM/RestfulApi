@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Movies.Api.Auth;
+using Movies.Api.Health;
 using Movies.Api.Mapping;
 using Movies.Api.Swagger;
 using Movies.Application;
@@ -25,7 +26,23 @@ services.AddApiVersioning(x =>
     x.ApiVersionReader = new MediaTypeApiVersionReader("api-version");
 }).AddMvc().AddApiExplorer();
 
+//services.AddResponseCaching();
+services.AddOutputCache(x =>
+{
+    x.AddBasePolicy(c => c.Cache());
+    x.AddPolicy("MovieChache", c =>
+    {
+        c.Cache()
+            .Expire(TimeSpan.FromMinutes(1))
+            .SetVaryByQuery(new[] { "title", "year", "sortBy", "page", "pageSize" })
+            .Tag("movies");
+    });
+});
+
 services.AddControllers();
+
+services.AddHealthChecks() // Makes sure that my api is up and running
+    .AddCheck<DatabaseHealthCheck>(DatabaseHealthCheck.Name);
 
 services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 services.AddSwaggerGen(x => x.OperationFilter<SwaggerDefaultValues>());
@@ -52,10 +69,16 @@ services.AddAuthentication(x =>
 
 services.AddAuthorization(x =>
 {
-    x.AddPolicy(AuthConstants.AdminUserPolicyName, p => p.RequireClaim(AuthConstants.AdminClaimName, "true"));
+    //x.AddPolicy(AuthConstants.AdminUserPolicyName, p => p.RequireClaim(AuthConstants.AdminClaimName, "true"));
+
+    x.AddPolicy(AuthConstants.AdminUserPolicyName,
+        p => p.AddRequirements(new AdminAuthRequirement(config["ApiKey"]!)));
 
     x.AddPolicy(AuthConstants.TrustedUserPolicyName, p => p.RequireAssertion(c => c.User.HasClaim(m => m is { Type: AuthConstants.AdminClaimName, Value: "true" }) || c.User.HasClaim(m => m is { Type: AuthConstants.TrustedUserClaimName, Value: "true" })));
 });
+
+services.AddScoped<ApiKeyAuthFilter>();
+
 
 services.AddApplication();
 var connectionString = config.GetRequiredSection("Database:ConnectionString").Value;
@@ -79,9 +102,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.MapHealthChecks("_health");
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
+//app.UseCors();
+//app.UseResponseCaching();
+app.UseOutputCache();
 
 app.MapControllers();
 

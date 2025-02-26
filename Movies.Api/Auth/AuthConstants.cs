@@ -6,5 +6,7 @@
         public const string AdminClaimName = "admin";
         public const string TrustedUserPolicyName = "Trusted";
         public const string TrustedUserClaimName = "trusted_member";
+
+        public const string ApiKeyHeaderName = "x-api-key";
     }
 }
